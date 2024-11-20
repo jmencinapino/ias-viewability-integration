@@ -1,0 +1,51 @@
+<!-- IAS CUSTOM SCRIPT BACKGROUND SNIPPET -->
+<script type="application/javascript">
+    (function(w){
+        // IAS Configuration Parameters
+        let iasConfig = {
+            iasPixel: 'https://ad.doubleclick.net/ddm/trackimp/pixel-URL',
+            iasLibrary: 'https://pixel.adsafeprotected.com/rjss/st/123456/7891/skeleton.js',
+            backupPixel: 'https://pixel.adsafeprotected.com/rfw/st/123456/7891/skeleton.gif?gdpr=[sas_gdpr_applies]&gdpr_consent=[sas_gdpr_consent]&gdpr_pd=',
+            adContainerRef: '%23ias-counting' // Mandatory value for background
+        };
+        // Basic DOM Elements
+        var d = w.document, h = d.getElementsByTagName('head')[0], b = d.body;
+        
+        // IAS extra container
+        extraContainer = d.createElement('IMG');
+        extraContainer.setAttribute('id','ias-counting');
+        extraContainer.setAttribute('src','https://domain.com/transparent.png');
+        extraContainer.setAttribute('style','width:100px;height:100vh;border:0px;display:block;position:absolute;top:20px;');
+        extraContainer.appendChild(document.createTextNode(code));
+ 
+        // IAS Pixel declaration
+        iasPixel = d.createElement('IMG');
+        iasPixel.type ='image';
+        iasPixel.setAttribute('style', 'width:1px;height:1px;border:0px;');
+        iasPixel.setAttribute('src', iasConfig.iasPixel);
+        // IAS Skeleton Library declaration
+        iasLibrary = d.createElement('SCRIPT');
+        iasLibrary.type = 'application/javascript';
+        iasLibrary.setAttribute('async', 'true');
+        iasLibrary.setAttribute('src', iasConfig.iasLibrary + '?ias_adpath=' + iasConfig.adContainerRef);
+        // IAS Skeleton Backup Pixel declaration
+        var backupCode = `<IMG SRC="${iasConfig.backupPixel}" BORDER=0 WIDTH=1 HEIGHT=1 ALT="">`,
+        backupPixel = d.createElement('NOSCRIPT');
+        backupPixel.type ='application/javascript';
+        backupPixel.appendChild(d.createTextNode(backupCode));
+ 
+        // IAS Code Injection
+        if (typeof w.sas_ajax != 'undefined' && w.sas_ajax) {
+            if(extraContainer) w.sas_appendToContainer([sas_formatId] , extraContainer);
+            w.sas_appendToContainer([sas_formatId] , iasPixel);
+            w.sas_appendToContainer([sas_formatId] , iasLibrary);
+            w.sas_appendToContainer([sas_formatId] , backupPixel);
+        }
+        else {
+            if(extraContainer)b.appendChild(extraContainer);
+            b.appendChild(iasPixel);
+            b.appendChild(iasLibrary);
+            b.appendChild(backupPixel);
+        }
+    })(window.top);
+</script>
