@@ -2,126 +2,133 @@
 
 This repository provides a guide for integrating an IAS Viewability Pixel.
 
->[!NOTE]
-> This product is not officially supported. The following information is part of a workaround provided by Equativ's team. Each integration case could require individual treatment based on unique requirements.
+>[!NOTE]  
+>This product is not officially supported. The following information is part of a workaround provided by Equativ's service teams. Each integration case may require individual treatment based on unique requirements.
+
 ---
+
 ## Context
 
-To measure viewability, IAS typically provides three main items:
+Integral Ad Science (IAS) provides clients with the ability to measure both impressions and viewability through the integration of several scripts and elements.  
+These elements must be integrated at Equativ's insertion/creative level to ensure accurate measurement.
 
-1. A third-party pixel (e.g. DoubleClick, etc).
-2. A unique IAS library reference, usually skeleton.js.
-3. A no-script pixel reference is used as a backup for the main library, usually skeleton.gif.
+## Overview
 
-Equativ's Customized Script will integrate these three elements at the insertion level.
+To proceed with the integration, IAS typically provides three main items:
+
+1. A third-party pixel (e.g. DoubleClick).
+2. A unique IAS library reference, usually `skeleton.js`.
+3. A no-script pixel reference used as a backup, usually `skeleton.gif`.
+
+Here is an example of the code originally provided by IAS:
+```html
+<!-- Third-part pixel -->
+<img src="https://ad.doubleclick.net/ddm/trackimp/pixel-URL" alt="" width="0" height="0" border="0">
+<!-- IAS Library / skeleton.js -->
+<script src="https://pixel.adsafeprotected.com/rjss/st/123456/7891/skeleton.js"></script>
+<!-- NoScript pixel -->
+ <noscript><img src="https://pixel.adsafeprotected.com/rfw/st/123456/7891/skeleton.gif?gdpr=[sas_gdpr_applies]&gdpr_consent=[sas_gdpr_consent]&gdpr_pd=" alt=""></noscript> 
+```
+
+Equativ's Customized Script feature provides a place where this code can be integrated, following the steps described below.
 
 ---
 
-## Integration
+# Integration
 
-### Ad Container Reference
+## 1. Ad Container Reference
 
-During configuration, IAS requires referencing the container that requires measurement.
+During configuration, IAS requires referencing the container that needs measurement.
 
-This container must be identified using either the ID or Class selector.
+Determine what kind of container reference will be required by reviewing the ad container where creatives will be displayed. By default, the ad container reference will be the ID `sas_formatId` (also included as a macro like `[sas_tagId]`).
 
-ID: using %23.
-```
-E.g. %23IDName
-```
+IAS will use the container's information to reference the proper container that needs to be measured with:
 
-Class: using (.).
-```
-E.g. .className
-```
-> [!IMPORTANT]
-> `%23` is the encoded version of the character `#`.
+- ID by using the character `%23` (encoded `#`). E.g., `%23id_ref`
+- Class by using the character `.`. E.g., `.class_ref`
 
 ---
 
-### How Can I Determine What is the Proper Selector?
+## 2. Main Integration
 
-Review the ad container where creatives will be displayed.
+### Script Library Integration
 
-By default, if there are no custom references, the ad container reference will be `sas_formatId`.
+The following code was created to simplify the integration of the code into the Custom Script at the insertion level.
 
----
- 
-### Script Integration
+As a client, you need to modify the IAS Configuration Parameters by adding your own IAS references, providing values for the following parameters:
 
-To simplify the integration of the code into the Custom Script at the insertion level, we developed the code below.
+- `iasPixel`: URL
+- `iasLibrary`: URL
+- `adContainerRef`: ID/Class selector
 
-As a client, it is needed to modify the IAS Configuration Parameters by adding your own IAS references, following the standard information provided by IAS as mentioned above.
+This means clients only need to use URL references as part of the configuration.
 
-- iasPixel: URL
-- iasLibrary: URL
-- backupPixel: URL
-- adContainerRef: ID/Class selector
-
-> [!NOTE]
-> This field is using `%23[sas_tagId]` by default. `[sas_tagId]` corresponds to a macro in Equativ which will be replaced by the value: `sas_formatId`.
-
----
-
-Code example:
+#### Code example:
 ```javascript
 let iasConfig = {
     iasPixel: 'https://ad.doubleclick.net/track/pixel-URL',
     iasLibrary: 'https://pixel.com/123456/7891/skeleton.js',
-    backupPixel: 'https://pixel.com/123456/7891/skeleton.gif',
     /* %23 -> ID selector || . -> Class selector */
     adContainerRef: '%23[sas_tagId]'
 };
 ```
 
-The rest of the present code will create an element for each of the available URLs.
+#### NoScript Integration
 
-Code does not need to be modified for standard/default banner integrations.
+In addition IAS provides a `noscript` snippet for integrating a Skeleton Backup Pixel.
 
-```javascript
-(function(w){
-    // IAS Configuration Parameters
-    let iasConfig = {
-        iasPixel: 'https://ad.doubleclick.net/ddm/trackimp/pixel-URL',
-        iasLibrary: 'https://pixel.adsafeprotected.com/rjss/st/123456/7891/skeleton.js',
-        backupPixel: 'https://pixel.adsafeprotected.com/rfw/st/123456/7891/skeleton.gif?gdpr=[sas_gdpr_applies]&gdpr_consent=[sas_gdpr_consent]&gdpr_pd=',
-        adContainerRef: '%23[sas_tagId]' // %23 -> ID selector || . -> Class selector  
-    };
-    // Basic DOM Elements
-    var d = w.document, h = d.getElementsByTagName('head')[0], b = d.body;
-    
-    // IAS extra container (if needed)
+This portion of the code should be kept as provided.
 
-    // IAS Pixel declaration
-    iasPixel = d.createElement('IMG');
-    iasPixel.type ='image';
-    iasPixel.setAttribute('style', 'width:1px;height:1px;border:0px;');
-    iasPixel.setAttribute('src', iasConfig.iasPixel);
-    // IAS Skeleton Library declaration
-    iasLibrary = d.createElement('SCRIPT');
-    iasLibrary.type = 'application/javascript';
-    iasLibrary.setAttribute('async', 'true');
-    iasLibrary.setAttribute('src', iasConfig.iasLibrary + '?ias_adpath=' + iasConfig.adContainerRef);
-    // IAS Skeleton Backup Pixel declaration
-    var backupCode = `<IMG SRC="${iasConfig.backupPixel}" BORDER=0 WIDTH=1 HEIGHT=1 ALT="">`,
-    backupPixel = d.createElement('NOSCRIPT');
-    backupPixel.type ='application/javascript';
-    backupPixel.appendChild(d.createTextNode(backupCode));
+```html
+<noscript><img src="SKELETON_BCKUP_PIXEL_URL" alt=""></noscript>
+```
 
-    // IAS Code Injection
-    if (typeof w.sas_ajax != 'undefined' && w.sas_ajax) {
-        if(extraContainer) w.sas_appendToContainer([sas_formatId] , extraContainer);
-        w.sas_appendToContainer([sas_formatId] , iasPixel);
-        w.sas_appendToContainer([sas_formatId] , iasLibrary);
-        w.sas_appendToContainer([sas_formatId] , backupPixel);
-    }
-    else {
-        if(extraContainer)b.appendChild(extraContainer);
-        b.appendChild(iasPixel);
-        b.appendChild(iasLibrary);
-        b.appendChild(backupPixel);
-    }
-})(window.top);
+#### Complete Code
+The example below illustrates how the final integration of the IAS code should be structured.
+
+```html
+<!-- IAS CUSTOM SCRIPT STANDARD SNIPPET -->
+<script type="application/javascript">
+    (function(w){
+        // IAS Configuration Parameters
+        let iasConfig = {
+            iasPixel: 'https://ad.doubleclick.net/ddm/trackimp/pixel-URL',
+            iasLibrary: 'https://pixel.adsafeprotected.com/rjss/st/123456/7891/skeleton.js',
+            adContainerRef: '%23[sas_tagId]' // %23 -> ID selector || . -> Class selector  
+        };
+        // Basic DOM Elements
+        var d = w.document, h = d.getElementsByTagName('head')[0], b = d.body;
+
+        // IAS Pixel declaration
+        iasPixel = d.createElement('IMG');
+        iasPixel.type ='image';
+        iasPixel.setAttribute('style', 'width:1px;height:1px;border:0px;');
+        iasPixel.setAttribute('src', iasConfig.iasPixel);
+
+        // IAS Skeleton Library declaration
+        iasLibrary = d.createElement('SCRIPT');
+        iasLibrary.type = 'application/javascript';
+        iasLibrary.setAttribute('async', 'true');
+        iasLibrary.setAttribute('src', iasConfig.iasLibrary + '?ias_adpath=' + iasConfig.adContainerRef);
+ 
+        // IAS Code Injection
+        if (typeof w.sas_ajax != 'undefined' && w.sas_ajax) {
+            if(extraContainer) w.sas_appendToContainer([sas_formatId] , extraContainer);
+            w.sas_appendToContainer([sas_formatId] , iasPixel);
+            w.sas_appendToContainer([sas_formatId] , iasLibrary);
+        }
+        else {
+            if(extraContainer)b.appendChild(extraContainer);
+            b.appendChild(iasPixel);
+            b.appendChild(iasLibrary);
+        }
+    })(window.top);
+</script>
+
+<!-- IAS Skeleton Backup Pixel -->
+<noscript>
+    <img src="https://pixel.adsafeprotected.com/rfw/st/123456/7891/skeleton.gif?gdpr=[sas_gdpr_applies]&gdpr_consent=[sas_gdpr_consent]&gdpr_pd=" alt="">
+</noscript>
 ```
 > [!NOTE]
 > See also the complete version of the code at `ias-custom-script-standard.html` file attached to this repository.
@@ -162,6 +169,10 @@ let iasConfig = {
 
 ## Disclaimer
 
-While this is used for most IAS viewability interactions, we recommend that you consult your IAS contact if it does not work as expected to improve and optimize this integration.
+> [!IMPORTANT]  
+> Third-party integrations must be tested in a controlled environment before using them as part of the Equativ's creative configuration. It is recommended to contact with IAS if it does not work as expected to improve and optimize this integration.
+> Ensure compliance with privacy regulations (e.g., GDPR, CCPA) when handling user data, and confirm that the integration aligns with the [official Custom Script feature documentation](https://help.smartadserver.com/s/article/Configuring-creatives#:~:text=unchecked%20by%20default.-,Custom%20script%20(for%20creatives),-You%20can%20add).
 
-This is a dedicated custom integration created specifically for IAS integration.
+> [!WARNING]  
+> External scripts can introduce security risks or performance degradation if not implemented properly.
+> Equativ is only responsible for executing the Custom Script feature. Any actions performed during the script execution itself are not the responsibility of Equativ.
