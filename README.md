@@ -34,9 +34,9 @@ Equativ's Customized Script feature provides a place where this code can be inte
 
 ---
 
-# Integration
+## Integration
 
-## 1. Ad Container Reference
+### 1. Ad Container Reference
 
 During configuration, IAS requires referencing the container that needs measurement.
 
@@ -49,9 +49,9 @@ IAS will use the container's information to reference the proper container that 
 
 ---
 
-## 2. Main Integration
+### 2. Main Integration
 
-### Script Library Integration
+#### Script Library Integration
 
 The following code was created to simplify the integration of the code into the Custom Script at the insertion level.
 
@@ -63,7 +63,7 @@ As a client, you need to modify the IAS Configuration Parameters by adding your 
 
 This means clients only need to use URL references as part of the configuration.
 
-#### Code example:
+##### Code example:
 ```javascript
 let iasConfig = {
     iasPixel: 'https://ad.doubleclick.net/track/pixel-URL',
@@ -73,7 +73,7 @@ let iasConfig = {
 };
 ```
 
-#### NoScript Integration
+##### NoScript Integration
 
 In addition IAS provides a `noscript` snippet for integrating a Skeleton Backup Pixel.
 
@@ -83,7 +83,7 @@ This portion of the code should be kept as provided.
 <noscript><img src="SKELETON_BCKUP_PIXEL_URL" alt=""></noscript>
 ```
 
-#### Complete Code
+##### Complete Code
 The example below illustrates how the final integration of the IAS code should be structured.
 
 ```html
@@ -135,10 +135,10 @@ The example below illustrates how the final integration of the IAS code should b
 
 ---
 
-## 3. Specific Scenarios
+### 3. Specific Scenarios
 Equativ does not provide a default container reference in the following scenarios; therefore, this configuration must consider several details.
 
-### Interstitial Ad Integration
+#### Interstitial Ad Integration
 
 Interstitial Ads are not displayed directly into Equativ's default container given the display is required to take into account the whole screen size.
 
@@ -152,7 +152,7 @@ let iasConfig = {
     adContainerRef: '%23sas-interstitial'
 };
 ```
-### Background Ad Integration
+#### Background Ad Integration
 
 When Background Ads are displayed, IAS requires the implementation of an additional container described as:
 - Size: 50x50px (min.).
