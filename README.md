@@ -135,16 +135,31 @@ The example below illustrates how the final integration of the IAS code should b
 
 ---
 
-## Special Cases: Background Integration
+## 3. Specific Scenarios
+Equativ does not provide a default container reference in the following scenarios; therefore, this configuration must consider several details.
 
-When using this integration for non-standard ad formats, such as a Background template, IAS typically requires the implementation of an additional container. 
+### Interstitial Ad Integration
 
-The additional container must:
-- Adhere to a minimum dimension of 50x50 pixels
-- Contain a transparent Image as src
-- Remain visible during user interaction in accordance with IAS requirements.
+Interstitial Ads are not displayed directly into Equativ's default container given the display is required to take into account the whole screen size.
+
+In this particular case, the container id that needs to be referenced is: `sas-interstitial`.
+
+The code should include the change on the `adContainerRef` parameter.
+
+```javascript
+let iasConfig = {
+    // (...)
+    adContainerRef: '%23sas-interstitial'
+};
+```
+### Background Ad Integration
+
+When Background Ads are displayed, IAS requires the implementation of an additional container described as:
+- Size: 50x50px (min.).
+- Implement a transparent image as src.
+- Remain visible during user interaction.
  
-This is a practical example of the image container that must be integrated at the specified position (IAS extra container).
+Practical example IAS extra container:
 ```javascript
 // IAS extra container (if needed)
 extraContainer = d.createElement('IMG');
@@ -154,12 +169,11 @@ extraContainer.setAttribute('style','width:100px;height:100vh;border:0px;display
 extraContainer.appendChild(document.createTextNode(code));
 ```
 
-For this particular scenario, IAS Configuration Parameters should be also updated, following that adContainerRef should be replaced by: `%23ias-counting`.
-
+As for Interstitial Ads, the adContainerRef needs to be filled with the new container id: `%23ias-counting`.
 ```javascript
 // IAS Configuration Parameters
 let iasConfig = {
-    // rest of parameters
+    // (...)
     adContainerRef: '%23ias-counting'
 };
 ```
